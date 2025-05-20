@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>벽바둑</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(7, 60px);
+      grid-template-rows: repeat(7, 60px);
+      gap: 2px;
+    }
+    .cell {
+      width: 60px;
+      height: 60px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .player1 {
+      background-color: #ff6666;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+    }
+    .player2 {
+      background-color: #66aaff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+    }
+    .wall-top, .wall-right, .wall-bottom, .wall-left {
+      position: absolute;
+    }
+    .wall-top    { top: 0; left: 0; right: 0; height: 2px; }
+    .wall-right  { top: 0; right: 0; bottom: 0; width: 2px; }
+    .wall-bottom { bottom: 0; left: 0; right: 0; height: 2px; }
+    .wall-left   { top: 0; left: 0; bottom: 0; width: 2px; }
+    .wall-player1 { background-color: red !important; }
+    .wall-player2 { background-color: blue !important; }
+    .selected { filter: brightness(0.6); }
+    #status {
+      margin-top: 20px;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <h1>벽바둑</h1>
+  <div id="board"></div>
+  <div id="status">말을 배치하세요. 현재: 플레이어 1</div>
+  <audio id="wallSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+  <script>
+    // JavaScript 코드는 이전 세션의 최종 [2/3] + [3/3] 코드와 동일하게 삽입되어야 합니다.
+    // 이 셀에서는 간략화됨. 실제 제공 시 full JS 삽입.
+  </script>
+</body>
+</html>
