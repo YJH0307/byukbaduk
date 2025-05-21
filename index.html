@@ -5,28 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>창작 보드게임</title>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-      background-color: #f0f0f0;
-    }
-
-    .container {
-      width: 100%;
-      height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-
-    .game-area {
-      position: relative;
-      width: 460px; /* 보드 크기: 60*7 + 6*2 gap */
-      height: 460px;
-      transform-origin: top left;
+      height: 100vh;
+      background-color: #f0f0f0;
     }
 
     .board {
@@ -36,8 +21,7 @@
       gap: 2px;
       background-color: #222;
       padding: 4px;
-      position: relative;
-      z-index: 1;
+      touch-action: none;
     }
 
     .cell {
@@ -55,11 +39,15 @@
       touch-action: none;
       user-select: none;
       cursor: grab;
-      z-index: 2;
     }
 
-    .red { background-color: red; }
-    .blue { background-color: blue; }
+    .red {
+      background-color: red;
+    }
+
+    .blue {
+      background-color: blue;
+    }
 
     .wall {
       width: 60px;
@@ -68,36 +56,43 @@
       position: absolute;
       cursor: grab;
       transform-origin: center center;
-      z-index: 2;
     }
 
-    .wall.red { background-color: red; }
-    .wall.blue { background-color: blue; }
+    .wall.red {
+      background-color: red;
+    }
+
+    .wall.blue {
+      background-color: blue;
+    }
+
+    .game-area {
+      position: relative;
+      width: max-content;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="game-area" id="gameArea">
-      <div class="board" id="board"></div>
+  <div class="game-area">
+    <div class="board" id="board"></div>
 
-      <!-- 빨간 말 왼쪽 -->
-      <div class="piece red" style="top: 20px; left: -100px;"></div>
-      <div class="piece red" style="top: 100px; left: -100px;"></div>
-      <div class="piece red" style="top: 180px; left: -100px;"></div>
-      <div class="piece red" style="top: 260px; left: -100px;"></div>
+    <!-- 빨간 말 왼쪽 -->
+    <div class="piece red" style="top: 20px; left: -100px;"></div>
+    <div class="piece red" style="top: 100px; left: -100px;"></div>
+    <div class="piece red" style="top: 180px; left: -100px;"></div>
+    <div class="piece red" style="top: 260px; left: -100px;"></div>
 
-      <!-- 파란 말 오른쪽 -->
-      <div class="piece blue" style="top: 20px; left: 500px;"></div>
-      <div class="piece blue" style="top: 100px; left: 500px;"></div>
-      <div class="piece blue" style="top: 180px; left: 500px;"></div>
-      <div class="piece blue" style="top: 260px; left: 500px;"></div>
+    <!-- 파란 말 오른쪽 -->
+    <div class="piece blue" style="top: 20px; left: 500px;"></div>
+    <div class="piece blue" style="top: 100px; left: 500px;"></div>
+    <div class="piece blue" style="top: 180px; left: 500px;"></div>
+    <div class="piece blue" style="top: 260px; left: 500px;"></div>
 
-      <!-- 빨간 벽 25개 -->
-      <div id="red-walls"></div>
+    <!-- 빨간 벽 25개 -->
+    <div id="red-walls"></div>
 
-      <!-- 파란 벽 25개 -->
-      <div id="blue-walls"></div>
-    </div>
+    <!-- 파란 벽 25개 -->
+    <div id="blue-walls"></div>
   </div>
 
   <script>
@@ -166,19 +161,6 @@
         wall.style.transform = `rotate(${next}deg)`;
       }
     });
-
-    // 반응형 scale 설정
-    function updateScale() {
-      const gameArea = document.getElementById("gameArea");
-      const scale = Math.min(
-        window.innerWidth / 700,
-        window.innerHeight / 700
-      );
-      gameArea.style.transform = `scale(${scale})`;
-    }
-
-    window.addEventListener("resize", updateScale);
-    window.addEventListener("load", updateScale);
   </script>
 </body>
 </html>
