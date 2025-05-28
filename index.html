@@ -3,15 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>창작 보드게임</title>
+  <title>벽 클릭 설치형 보드게임</title>
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      height: 100vh;
+      width: 100vw;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
       background-color: #f0f0f0;
+    }
+
+    .game-area {
+      position: relative;
+      width: fit-content;
+      height: fit-content;
+      transform-origin: top left;
     }
 
     .board {
@@ -21,7 +30,7 @@
       gap: 2px;
       background-color: #222;
       padding: 4px;
-      touch-action: none;
+      position: relative;
     }
 
     .cell {
@@ -29,6 +38,7 @@
       height: 60px;
       background-color: #fff;
       box-sizing: border-box;
+      position: relative;
     }
 
     .piece {
@@ -39,93 +49,107 @@
       touch-action: none;
       user-select: none;
       cursor: grab;
+      z-index: 5;
     }
 
-    .red {
-      background-color: red;
-    }
+    .red { background-color: red; }
+    .blue { background-color: blue; }
 
-    .blue {
-      background-color: blue;
-    }
-
-    .wall {
-      width: 60px;
-      height: 6px;
-      background-color: gray;
+    /* 벽 테두리 */
+    .cell-border {
       position: absolute;
-      cursor: grab;
-      transform-origin: center center;
+      background-color: transparent;
+      transition: background-color 0.2s;
     }
 
-    .wall.red {
-      background-color: red;
+    .cell-border.top {
+      top: 0; left: 0;
+      width: 100%; height: 5px;
     }
 
-    .wall.blue {
-      background-color: blue;
+    .cell-border.bottom {
+      bottom: 0; left: 0;
+      width: 100%; height: 5px;
     }
 
-    .game-area {
-      position: relative;
-      width: max-content;
+    .cell-border.left {
+      top: 0; left: 0;
+      width: 5px; height: 100%;
     }
+
+    .cell-border.right {
+      top: 0; right: 0;
+      width: 5px; height: 100%;
+    }
+
+    .red-wall { background-color: red; }
+    .blue-wall { background-color: blue; }
   </style>
 </head>
 <body>
-  <div class="game-area">
+  <div class="game-area" id="gameArea">
     <div class="board" id="board"></div>
 
-    <!-- 빨간 말 왼쪽 -->
+    <!-- 빨간 말 -->
     <div class="piece red" style="top: 20px; left: -100px;"></div>
     <div class="piece red" style="top: 100px; left: -100px;"></div>
     <div class="piece red" style="top: 180px; left: -100px;"></div>
     <div class="piece red" style="top: 260px; left: -100px;"></div>
 
-    <!-- 파란 말 오른쪽 -->
+    <!-- 파란 말 -->
     <div class="piece blue" style="top: 20px; left: 500px;"></div>
     <div class="piece blue" style="top: 100px; left: 500px;"></div>
     <div class="piece blue" style="top: 180px; left: 500px;"></div>
     <div class="piece blue" style="top: 260px; left: 500px;"></div>
-
-    <!-- 빨간 벽 25개 -->
-    <div id="red-walls"></div>
-
-    <!-- 파란 벽 25개 -->
-    <div id="blue-walls"></div>
   </div>
 
   <script>
-    // 보드 셀 생성
     const board = document.getElementById("board");
-    for (let i = 0; i < 49; i++) {
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      board.appendChild(cell);
-    }
 
-    // 벽 생성 함수
-    function createWalls(containerId, color, leftPos) {
-      const container = document.getElementById(containerId);
-      for (let i = 0; i < 25; i++) {
-        const wall = document.createElement("div");
-        wall.className = `wall ${color}`;
-        wall.style.top = `${20 + i * 12}px`;
-        wall.style.left = `${leftPos}px`;
-        wall.dataset.rotation = "0";
-        container.appendChild(wall);
+    // 7x7 셀 생성
+    for (let row = 0; row < 7; row++) {
+      for (let col = 0; col < 7; col++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+
+        // 4방향 테두리
+        ["top", "bottom", "left", "right"].forEach(dir => {
+          const border = document.createElement("div");
+          border.classList.add("cell-border", dir);
+          border.dataset.state = "none"; // 초기 상태
+          border.addEventListener("click", () => {
+            cycleWallState(border);
+          });
+          cell.appendChild(border);
+        });
+
+        board.appendChild(cell);
       }
     }
 
-    createWalls("red-walls", "red", -180);
-    createWalls("blue-walls", "blue", 570);
+    // 클릭 시 상태 순환: 없음 → 빨간 → 파란 → 없음
+    function cycleWallState(border) {
+      const state = border.dataset.state;
+      if (state === "none") {
+        border.dataset.state = "red";
+        border.classList.remove("blue-wall");
+        border.classList.add("red-wall");
+      } else if (state === "red") {
+        border.dataset.state = "blue";
+        border.classList.remove("red-wall");
+        border.classList.add("blue-wall");
+      } else {
+        border.dataset.state = "none";
+        border.classList.remove("red-wall", "blue-wall");
+      }
+    }
 
-    // 드래그 기능 (말과 벽)
+    // 말 드래그 기능
     let dragged = null;
     let startX = 0, startY = 0;
     let origX = 0, origY = 0;
 
-    function makeDraggable(el) {
+    document.querySelectorAll(".piece").forEach(el => {
       el.addEventListener("pointerdown", e => {
         dragged = el;
         startX = e.clientX;
@@ -147,19 +171,6 @@
       el.addEventListener("pointerup", () => {
         dragged = null;
       });
-    }
-
-    document.querySelectorAll(".piece, .wall").forEach(makeDraggable);
-
-    // 더블클릭 회전
-    document.addEventListener("dblclick", e => {
-      if (e.target.classList.contains("wall")) {
-        let wall = e.target;
-        let current = parseInt(wall.dataset.rotation);
-        let next = (current + 90) % 360;
-        wall.dataset.rotation = next;
-        wall.style.transform = `rotate(${next}deg)`;
-      }
     });
   </script>
 </body>
